@@ -33,6 +33,11 @@ namespace UnityEngine.Rendering.RenderGraphModule
             }
         }
 
+        public bool IsPassUsingRenderTarget(int passId, int resourceId)
+        {
+            return nativeCompiler.contextData.nativepassFragmentsContain(passId, resourceId);
+        }
+
         void ExecuteNativeRenderGraph()
         {
             using (new ProfilingScope(m_RenderGraphContext.cmd, ProfilingSampler.Get(RenderGraphProfileId.ExecuteRenderGraph)))
