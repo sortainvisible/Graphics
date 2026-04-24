@@ -477,8 +477,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                 // Must come first
                 CullRenderGraphPassesWithNoSideEffect();
 
-                // Second step of the algorithm that comes later
-                CullRenderGraphPassesWritingOnlyUnusedResources();
+                // Disabled: causes depth input attachment to be culled when used as read-only in subpasses (SRP-897)
+                // CullRenderGraphPassesWritingOnlyUnusedResources();
             }
         }
 
