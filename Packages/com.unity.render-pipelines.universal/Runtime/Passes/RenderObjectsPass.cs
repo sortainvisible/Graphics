@@ -198,6 +198,7 @@ namespace UnityEngine.Rendering.Universal
             internal DebugRendererLists debugRendererLists;
 
             internal UniversalCameraData cameraData;
+            internal bool useDepthInput;
 
             // Required for code sharing purpose between RG and non-RG.
             internal RendererList rendererList;
@@ -295,6 +296,8 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseRendererList(passData.rendererListHdl);
                 }
 
+                passData.useDepthInput = useDepthInputAttachment && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan;
+
                 builder.AllowGlobalStateModification(true);
                 if (cameraData.xr.enabled)
                 {
@@ -308,7 +311,7 @@ namespace UnityEngine.Rendering.Universal
 
                 builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
                 {
-                    rgContext.cmd.SetKeyword(m_depthInputKeyword, useDepthInputAttachment && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan);
+                    rgContext.cmd.SetKeyword(m_depthInputKeyword, data.useDepthInput);
                     var isYFlipped = RenderingUtils.IsHandleYFlipped(rgContext, in data.color);
                     ExecutePass(data, rgContext.cmd, data.rendererListHdl, isYFlipped);
                 });
