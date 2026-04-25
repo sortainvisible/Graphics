@@ -28,13 +28,21 @@
 
 #if defined(_DEPTH_INPUT_ATTACHMENT)
     #define depth_input 0
-    FRAMEBUFFER_INPUT_FLOAT_MS(depth_input);
+    #if defined(_DEPTH_INPUT_ATTACHMENT_MSAA)
+        FRAMEBUFFER_INPUT_FLOAT_MS(depth_input);
+    #else
+        FRAMEBUFFER_INPUT_FLOAT(depth_input);
+    #endif
 #endif
 
 float shadergraph_LWSampleSceneDepth(float2 uv)
 {
 #if defined(_DEPTH_INPUT_ATTACHMENT)
-    return LOAD_FRAMEBUFFER_INPUT_MS(depth_input, 0, float2(0,0));
+    #if defined(_DEPTH_INPUT_ATTACHMENT_MSAA)
+        return LOAD_FRAMEBUFFER_INPUT_MS(depth_input, 0, float2(0,0));
+    #else
+        return LOAD_FRAMEBUFFER_INPUT(depth_input, float2(0,0));
+    #endif
 #endif
 
 #if defined(REQUIRE_DEPTH_TEXTURE)

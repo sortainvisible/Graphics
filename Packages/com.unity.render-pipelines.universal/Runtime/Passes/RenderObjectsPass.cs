@@ -16,7 +16,9 @@ namespace UnityEngine.Rendering.Universal
         RenderObjects.CustomCameraSettings m_CameraSettings;
 
         private const string DEPTH_INPUT_ATTACHMENT = "_DEPTH_INPUT_ATTACHMENT";
+        private const string DEPTH_INPUT_ATTACHMENT_MSAA = "_DEPTH_INPUT_ATTACHMENT_MSAA";
         private static GlobalKeyword m_depthInputKeyword;
+        private static GlobalKeyword m_depthInputMSAAKeyword;
 
         /// <summary>
         /// The override material to use.
@@ -142,6 +144,7 @@ namespace UnityEngine.Rendering.Universal
             m_CameraSettings = cameraSettings;
 
             m_depthInputKeyword = GlobalKeyword.Create(DEPTH_INPUT_ATTACHMENT);
+            m_depthInputMSAAKeyword = GlobalKeyword.Create(DEPTH_INPUT_ATTACHMENT_MSAA);
         }
 
         private static void ExecutePass(PassData passData, RasterCommandBuffer cmd, RendererList rendererList, bool isYFlipped)
@@ -199,6 +202,7 @@ namespace UnityEngine.Rendering.Universal
 
             internal UniversalCameraData cameraData;
             internal bool useDepthInput;
+            internal bool isDepthInputMSAA;
 
             // Required for code sharing purpose between RG and non-RG.
             internal RendererList rendererList;
@@ -297,6 +301,7 @@ namespace UnityEngine.Rendering.Universal
                 }
 
                 passData.useDepthInput = useDepthInputAttachment && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan;
+                passData.isDepthInputMSAA = passData.useDepthInput && cameraData.cameraTargetDescriptor.msaaSamples > 1;
 
                 builder.AllowGlobalStateModification(true);
                 if (cameraData.xr.enabled)
@@ -312,6 +317,7 @@ namespace UnityEngine.Rendering.Universal
                 builder.SetRenderFunc(static (PassData data, RasterGraphContext rgContext) =>
                 {
                     rgContext.cmd.SetKeyword(m_depthInputKeyword, data.useDepthInput);
+                    rgContext.cmd.SetKeyword(m_depthInputMSAAKeyword, data.isDepthInputMSAA);
                     var isYFlipped = RenderingUtils.IsHandleYFlipped(rgContext, in data.color);
                     ExecutePass(data, rgContext.cmd, data.rendererListHdl, isYFlipped);
                 });
