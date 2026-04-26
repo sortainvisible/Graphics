@@ -257,7 +257,11 @@ namespace UnityEngine.Rendering.Universal
                 passData.color = resourceData.activeColorTexture;
                 builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
                 
-                if (useDepthInputAttachment && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan)
+                bool useDepthInput = useDepthInputAttachment
+                    && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan
+                    && renderGraph.nativeRenderPassesEnabled;
+
+                if (useDepthInput)
                 {
                     builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.Read);
                     builder.SetInputAttachment(resourceData.activeDepthTexture, index: 0, AccessFlags.Read);
@@ -301,8 +305,8 @@ namespace UnityEngine.Rendering.Universal
                     builder.UseRendererList(passData.rendererListHdl);
                 }
 
-                passData.useDepthInput = useDepthInputAttachment && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan;
-                passData.isDepthInputMSAA = passData.useDepthInput && cameraData.cameraTargetDescriptor.msaaSamples > 1;
+                passData.useDepthInput = useDepthInput;
+                passData.isDepthInputMSAA = useDepthInput && cameraData.cameraTargetDescriptor.msaaSamples > 1;
 
                 builder.AllowGlobalStateModification(true);
                 if (cameraData.xr.enabled)
