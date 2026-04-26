@@ -250,6 +250,12 @@ namespace UnityEngine.Rendering.Universal
             if (renderingData.cameraData.cameraType == CameraType.Preview
                 || UniversalRenderer.IsOffscreenDepthTexture(ref renderingData.cameraData))
                 return;
+
+            // Re-apply per-frame: Create() may run before Application.isPlaying is true (renderer init phase),
+            // so the guarded assignment in Create() is skipped. Re-apply here where isPlaying is reliable.
+            if (settings.overrideDepthState && Application.isPlaying)
+                renderObjectsPass.useDepthInputAttachment = settings.depthInput;
+
             renderer.EnqueuePass(renderObjectsPass);
         }
     }

@@ -261,6 +261,7 @@ namespace UnityEngine.Rendering.Universal
                 {
                     builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.Read);
                     builder.SetInputAttachment(resourceData.activeDepthTexture, index: 0, AccessFlags.Read);
+                    builder.AllowPassCulling(false);
                 }
                 else
                 {
