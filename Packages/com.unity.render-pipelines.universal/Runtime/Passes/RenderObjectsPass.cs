@@ -325,6 +325,10 @@ namespace UnityEngine.Rendering.Universal
                     rgContext.cmd.SetKeyword(m_depthInputMSAAKeyword, data.isDepthInputMSAA);
                     var isYFlipped = RenderingUtils.IsHandleYFlipped(rgContext, in data.color);
                     ExecutePass(data, rgContext.cmd, data.rendererListHdl, isYFlipped);
+                    // Reset global keywords so they don't leak into subsequent editor/preview renders
+                    // that don't have a subpass input attachment configured (e.g. Inspector material preview).
+                    rgContext.cmd.SetKeyword(m_depthInputKeyword, false);
+                    rgContext.cmd.SetKeyword(m_depthInputMSAAKeyword, false);
                 });
             }
         }
